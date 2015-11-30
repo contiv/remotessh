@@ -4,6 +4,7 @@ Use this library to do remote testing of vagrant nodes.
 
 For example, this will select the "mynode" node and run "ls" on it.
 
+```go
     vagrant := &Vagrant{}
     vagrant.Setup(false, "", 3) // 3 node cluster, do not run `vagrant up`.
     out, err := vagrant.GetNode("mynode").RunCommandWithOutput("ls")
@@ -13,19 +14,23 @@ For example, this will select the "mynode" node and run "ls" on it.
     }
 
     fmt.Println(out) // already a string
+```
 
 If you want to walk nodes, you have a few options:
 
 Sequentially:
 
+```go
     vagrant := &vagrantssh.Vagrant{}
     vagrant.Setup(false, "", 3)
     for _, node := range vagrant.GetNodes() {
       node.RunCommand("something")
     }
+```
 
 In Parallel:
 
+```go
     vagrant := &vagrantssh.Vagrant{}
     vagrant.Setup(false, "", 3)
     err := vagrant.IterateNodes(func (node vagrantssh.TestbedNode) error {
@@ -36,6 +41,7 @@ In Parallel:
       // one or more nodes failed
       panic(err)
     }
+```
 
 Copyright 2014 Cisco Systems Inc. All rights reserved.
 
