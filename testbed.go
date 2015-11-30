@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package vagrant_ssh
+package vagrantssh
 
 // Testbed is a collection of test nodes
 type Testbed interface {

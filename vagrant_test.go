@@ -1,4 +1,4 @@
-package vagrant_ssh
+package vagrantssh
 
 import (
 	"os"
