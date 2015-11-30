@@ -41,7 +41,7 @@ func (v *vagrantTestSuite) TestRun(c *C) {
 
 func (v *vagrantTestSuite) TestRunWithOutput(c *C) {
 	for _, node := range v.vagrant.GetNodes() {
-		out, err := node.RunCommandWithOutput("hostname")
+		out, err := node.RunCommandWithOutput("whoami")
 		c.Assert(err, IsNil)
 		c.Assert(strings.TrimSpace(out), Equals, "vagrant")
 	}
