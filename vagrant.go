@@ -68,7 +68,10 @@ type Vagrant struct {
 	nodes         map[string]TestbedNode
 }
 
-// Setup brings up a vagrant testbed
+// Setup brings up a vagrant testbed. `start` means to run `vagrant up`. env is
+// a string of values to prefix before each command run on each VagrantNode.
+// numNodes is the number of nodes you want to track: these will be scanned
+// from the vagrant file sequentially.
 func (v *Vagrant) Setup(start bool, env string, numNodes int) error {
 	v.nodes = map[string]TestbedNode{}
 
@@ -171,7 +174,11 @@ func (v *Vagrant) Setup(start bool, env string, numNodes int) error {
 	return nil
 }
 
-// Teardown cleans up a vagrant testbed
+// Teardown cleans up a vagrant testbed. It performs `vagrant destroy -f` to
+// tear down the environment. While this method can be useful, the notion of
+// VMs that clean up after themselves (with an appropriate Makefile to control
+// vm availability) will be considerably faster than a method that uses this in
+// a suite teardown.
 func (v *Vagrant) Teardown() {
 	for _, node := range v.nodes {
 		vnode := node.(*VagrantNode)
@@ -188,12 +195,14 @@ func (v *Vagrant) Teardown() {
 	v.expectedNodes = 0
 }
 
-// GetNode obtains a node by name.
+// GetNode obtains a node by name. The name is the name of the VM provided at
+// `config.vm.define` time in Vagrantfiles. It is *not* the hostname of the
+// machine, which is `vagrant` for all VMs by default.
 func (v *Vagrant) GetNode(name string) TestbedNode {
 	return v.nodes[name]
 }
 
-// GetNodes returns the nodes in a vagrant setup
+// GetNodes returns the nodes in a vagrant setup, returned sequentially.
 func (v *Vagrant) GetNodes() []TestbedNode {
 	var ret []TestbedNode
 	for _, value := range v.nodes {
@@ -204,7 +213,7 @@ func (v *Vagrant) GetNodes() []TestbedNode {
 }
 
 // IterateNodes walks each host and executes the function supplied. On error,
-// it waits for all hosts to complete before returning the error.
+// it waits for all hosts to complete before returning the error, if any.
 func (v *Vagrant) IterateNodes(fn func(TestbedNode) error) error {
 	wg := sync.WaitGroup{}
 	nodes := v.GetNodes()
