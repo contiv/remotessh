@@ -1,5 +1,7 @@
 ## vagrantssh: Test your vagrant files through SSH with a simple library.
 
+godoc is [here](https://godoc.org/github.com/contiv/vagrantssh)
+
 Use this library to do remote testing of vagrant nodes.
 
 For example, this will select the "mynode" node and run "ls" on it.
