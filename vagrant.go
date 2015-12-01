@@ -240,8 +240,8 @@ func (v *Vagrant) IterateNodes(fn func(TestbedNode) error) error {
 	}
 }
 
-// SSHAllNodes will ssh into each host and run the specified command.
-func (v *Vagrant) SSHAllNodes(cmd string) error {
+// SSHExecAllNodes will ssh into each host and run the specified command.
+func (v *Vagrant) SSHExecAllNodes(cmd string) error {
 	return v.IterateNodes(func(node TestbedNode) error {
 		return node.RunCommand(cmd)
 	})
