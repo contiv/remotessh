@@ -1,13 +1,17 @@
-all: test
+all: stop start test
+	make stop
 
-reflex-test: vagrantup
+reflex-test: start
 	reflex -r '\.go' make test
 
-test: vagrantup golint
+test: start golint
 	godep go test -v ./... -check.v
-
-vagrantup:
-	vagrant up
 
 golint:
 	golint ./...
+
+stop:
+	vagrant destroy -f
+
+start:
+	vagrant up
