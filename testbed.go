@@ -20,4 +20,6 @@ type Testbed interface {
 	Setup(start bool, env string, numNodes int) error
 	Teardown()
 	GetNodes() []TestbedNode
+	GetNode(name string) TestbedNode
+	IterateNodes(fn func(TestbedNode) error)
 }
