@@ -62,7 +62,7 @@ func NewVagrantNode(name, port, privKeyFile string) (*VagrantNode, error) {
 	return vnode, nil
 }
 
-//9 Cleanup clears the ssh client resources
+// Cleanup clears the ssh client resources
 func (n *VagrantNode) Cleanup() {
 	n.client.Close()
 }
