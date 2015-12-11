@@ -10,7 +10,7 @@ import (
 )
 
 type vagrantTestSuite struct {
-	vagrant *Vagrant
+	vagrant Testbed
 }
 
 var _ = Suite(&vagrantTestSuite{})
