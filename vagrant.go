@@ -1,13 +1,31 @@
-// Package vagrantssh provides vagrant connectivity in go for testing.
 /*
+Package vagrantssh provides host connectivity in go for system/integration
+testing in a multi host environment. It supports two testbed environments viz.
+baremetal and vagrant
 
-Use this library to do remote testing of vagrant nodes.
+Use this library to do remote testing with baremetal or vagrant nodes.
 
-For example, this will select the "mynode" node and run "ls" on it.
+For example, To setup a baremetal setup with a host node with ssh reachability '1.2.3.4' and
+port '22' for user 'foo', you can initialize the setup as:
+	hosts := []HostInfo{
+		{ Name: "mynode",
+		  SSHAddr: "1.2.3.4",
+		  SSHPort: "22"
+		  User: "foo",
+		  PrivKey: "path/to/foo's/privkey/file",
+	    },
+	}
+    tb := &Baremetal{}
+	tb.Setup(hosts)
 
-    vagrant := &Vagrant{}
-    vagrant.Setup(false, "", 3) // 3 node cluster, do not run `vagrant up`.
-    out, err := vagrant.GetNode("mynode").RunCommandWithOutput("ls")
+Or to auto connect to a vagrant based setup you can initialize the setup as:
+    tb := &Vagrant{}
+    tb.Setup(false, "", 3) // 3 node cluster, do not run `vagrant up`.
+
+Once you have your favorite setup initialized, this will select the "mynode" node
+and run "ls" on it.
+
+    out, err := tb.GetNode("mynode").RunCommandWithOutput("ls")
     if err != nil {
       // exit status != 0
       panic(err)
@@ -19,17 +37,13 @@ If you want to walk nodes, you have a few options:
 
 Sequentially:
 
-    vagrant := &vagrantssh.Vagrant{}
-    vagrant.Setup(false, "", 3)
-    for _, node := range vagrant.GetNodes() {
+    for _, node := range tb.GetNodes() {
       node.RunCommand("something")
     }
 
 In Parallel:
 
-    vagrant := &vagrantssh.Vagrant{}
-    vagrant.Setup(false, "", 3)
-    err := vagrant.IterateNodes(func (node vagrantssh.TestbedNode) error {
+    err := tb.IterateNodes(func (node vagrantssh.TestbedNode) error {
       return node.RunCommand("docker ps -aq | xargs docker rm")
     })
 
@@ -57,7 +71,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"sync"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -68,11 +81,11 @@ type Vagrant struct {
 	nodes         map[string]TestbedNode
 }
 
-// Setup brings up a vagrant testbed. `start` means to run `vagrant up`. env is
-// a string of values to prefix before each command run on each VagrantNode.
+// setup brings up a vagrant testbed. `start` means to run `vagrant up`. env is
+// a string of values to prefix before each command run on each SSHNode.
 // numNodes is the number of nodes you want to track: these will be scanned
 // from the vagrant file sequentially.
-func (v *Vagrant) Setup(start bool, env string, numNodes int) error {
+func (v *Vagrant) setup(start bool, env string, numNodes int) error {
 	v.nodes = map[string]TestbedNode{}
 
 	vCmd := &VagrantCommand{ContivNodes: numNodes, ContivEnv: env}
@@ -164,14 +177,28 @@ func (v *Vagrant) Setup(start bool, env string, numNodes int) error {
 				nodeName, nodeInfosBytes[nodeInfoPos+2], err)
 		}
 		log.Infof("Adding node: %q(%s:%s)", nodeName, port, privKeyFile)
-		var node *VagrantNode
-		if node, err = NewVagrantNode(nodeName, port, privKeyFile); err != nil {
+		var node *SSHNode
+		if node, err = NewSSHNode(nodeName, "vagrant", "127.0.0.1", port, privKeyFile); err != nil {
 			return err
 		}
 		v.nodes[node.GetName()] = TestbedNode(node)
 	}
 
 	return nil
+}
+
+// Setup initializes a vagrant testbed.
+func (v *Vagrant) Setup(args ...interface{}) error {
+	if _, ok := args[0].(bool); !ok {
+		return unexpectedSetupArgError("bool, string, int", args...)
+	}
+	if _, ok := args[1].(string); !ok {
+		return unexpectedSetupArgError("bool, string, int", args...)
+	}
+	if _, ok := args[2].(int); !ok {
+		return unexpectedSetupArgError("bool, string, int", args...)
+	}
+	return v.setup(args[0].(bool), args[1].(string), args[2].(int))
 }
 
 // Teardown cleans up a vagrant testbed. It performs `vagrant destroy -f` to
@@ -181,7 +208,11 @@ func (v *Vagrant) Setup(start bool, env string, numNodes int) error {
 // a suite teardown.
 func (v *Vagrant) Teardown() {
 	for _, node := range v.nodes {
-		vnode := node.(*VagrantNode)
+		vnode, ok := node.(*SSHNode)
+		if !ok {
+			log.Errorf("invalid node type encountered: %T", vnode)
+			continue
+		}
 		vnode.Cleanup()
 	}
 	vCmd := &VagrantCommand{ContivNodes: v.expectedNodes}
@@ -215,34 +246,10 @@ func (v *Vagrant) GetNodes() []TestbedNode {
 // IterateNodes walks each host and executes the function supplied. On error,
 // it waits for all hosts to complete before returning the error, if any.
 func (v *Vagrant) IterateNodes(fn func(TestbedNode) error) error {
-	wg := sync.WaitGroup{}
-	nodes := v.GetNodes()
-	errChan := make(chan error, len(nodes))
-
-	for _, node := range nodes {
-		wg.Add(1)
-
-		go func(node TestbedNode) {
-			if err := fn(node); err != nil {
-				errChan <- fmt.Errorf(`Error: "%v" on host: %q"`, err, node.GetName())
-			}
-			wg.Done()
-		}(node)
-	}
-
-	wg.Wait()
-
-	select {
-	case err := <-errChan:
-		return err
-	default:
-		return nil
-	}
+	return iterateNodes(v, fn)
 }
 
 // SSHExecAllNodes will ssh into each host and run the specified command.
 func (v *Vagrant) SSHExecAllNodes(cmd string) error {
-	return v.IterateNodes(func(node TestbedNode) error {
-		return node.RunCommand(cmd)
-	})
+	return sshExecAllNodes(v, cmd)
 }
