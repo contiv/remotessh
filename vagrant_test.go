@@ -1,3 +1,5 @@
+// +build vagrant
+
 package vagrantssh
 
 import (
@@ -27,6 +29,11 @@ func (v *vagrantTestSuite) SetUpSuite(c *C) {
 	vagrant := &Vagrant{}
 	vagrant.Setup(false, "", 3)
 	v.vagrant = vagrant
+}
+
+func (v *vagrantTestSuite) TestSetupInvalidArgs(c *C) {
+	vagrant := &Vagrant{}
+	c.Assert(vagrant.Setup(1, "foo"), ErrorMatches, "Unexpected args to Setup.*Expected:.*Received:.*")
 }
 
 func (v *vagrantTestSuite) TestRun(c *C) {
