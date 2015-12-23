@@ -24,4 +24,4 @@ stop:
 	vagrant destroy -f
 
 start:
-	vagrant up
+	vagrant up --provider virtualbox

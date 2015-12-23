@@ -75,6 +75,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+var (
+	identityFileRegexp = regexp.MustCompile(`IdentityFile "*(.+?)"*$`)
+	portRegexp         = regexp.MustCompile(`Port (.+?)$`)
+)
+
 // Vagrant implements a vagrant based testbed
 type Vagrant struct {
 	expectedNodes int
@@ -166,19 +171,24 @@ func (v *Vagrant) setup(start bool, env string, numNodes int) error {
 		if nodeInfoPos == -1 {
 			return fmt.Errorf("Failed to find %q info in vagrant ssh-config output: \n%s\n", nodeName, output)
 		}
-		port := ""
-		if n, err := fmt.Sscanf(string(nodeInfosBytes[nodeInfoPos+1]), "Port %s", &port); n == 0 || err != nil {
-			return fmt.Errorf("Failed to find %q port info in vagrant ssh-config output: \n%s\n. Error: %s",
-				nodeName, nodeInfosBytes[nodeInfoPos+1], err)
+
+		portInfo := string(nodeInfosBytes[nodeInfoPos+1])
+		idInfo := string(nodeInfosBytes[nodeInfoPos+2])
+
+		port := portRegexp.FindStringSubmatch(portInfo)
+		if port == nil || len(port) < 2 {
+			return fmt.Errorf("Failed to find %q port info in vagrant ssh-config output: \n%s\n",
+				nodeName, portInfo)
 		}
-		privKeyFile := ""
-		if n, err := fmt.Sscanf(string(nodeInfosBytes[nodeInfoPos+2]), "IdentityFile %s", &privKeyFile); n == 0 || err != nil {
-			return fmt.Errorf("Failed to find %q identity file info in vagrant ssh-config output: \n%s\n. Error: %s",
-				nodeName, nodeInfosBytes[nodeInfoPos+2], err)
+
+		privKeyFile := identityFileRegexp.FindStringSubmatch(idInfo)
+		if privKeyFile == nil || len(port) < 2 {
+			return fmt.Errorf("Failed to find %q identity file info in vagrant ssh-config output: \n%s\n.", nodeName, idInfo)
 		}
-		log.Infof("Adding node: %q(%s:%s)", nodeName, port, privKeyFile)
+
+		log.Infof("Adding node: %q(%s:%s)", nodeName, port[1], privKeyFile[1])
 		var node *SSHNode
-		if node, err = NewSSHNode(nodeName, "vagrant", "127.0.0.1", port, privKeyFile); err != nil {
+		if node, err = NewSSHNode(nodeName, "vagrant", "127.0.0.1", port[1], privKeyFile[1]); err != nil {
 			return err
 		}
 		v.nodes[node.GetName()] = TestbedNode(node)
