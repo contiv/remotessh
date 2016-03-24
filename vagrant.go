@@ -90,10 +90,10 @@ type Vagrant struct {
 // a string of values to prefix before each command run on each SSHNode.
 // numNodes is the number of nodes you want to track: these will be scanned
 // from the vagrant file sequentially.
-func (v *Vagrant) setup(start bool, env string, numContivNodes int, numIgnoreNodes int) error {
+func (v *Vagrant) setup(start bool, env string, nodes int) error {
 	v.nodes = map[string]TestbedNode{}
 
-	vCmd := &VagrantCommand{ContivNodes: numContivNodes, ContivEnv: env}
+	vCmd := &VagrantCommand{ContivNodes: nodes, ContivEnv: env}
 
 	if start {
 		output, err := vCmd.RunWithOutput("up")
@@ -110,7 +110,7 @@ func (v *Vagrant) setup(start bool, env string, numContivNodes int, numIgnoreNod
 		}()
 	}
 
-	v.expectedNodes = numContivNodes+numIgnoreNodes 
+	v.expectedNodes = nodes
 
 	output, err := vCmd.RunWithOutput("status")
 	if err != nil {
@@ -209,11 +209,8 @@ func (v *Vagrant) Setup(args ...interface{}) error {
 	if _, ok := args[2].(int); !ok {
 		return unexpectedSetupArgError("bool, string, int", args...)
 	}
-        if _, ok := args[3].(int); !ok {
-                return unexpectedSetupArgError("bool, string, int", args...)
-        }
 
-	return v.setup(args[0].(bool), args[1].(string), args[2].(int),args[3].(int))
+	return v.setup(args[0].(bool), args[1].(string), args[2].(int))
 }
 
 // Teardown cleans up a vagrant testbed. It performs `vagrant destroy -f` to
