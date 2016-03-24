@@ -90,10 +90,10 @@ type Vagrant struct {
 // a string of values to prefix before each command run on each SSHNode.
 // numNodes is the number of nodes you want to track: these will be scanned
 // from the vagrant file sequentially.
-func (v *Vagrant) setup(start bool, env string, nodes int) error {
+func (v *Vagrant) setup(start bool, env string, numNodes int) error {
 	v.nodes = map[string]TestbedNode{}
 
-	vCmd := &VagrantCommand{ContivNodes: nodes, ContivEnv: env}
+	vCmd := &VagrantCommand{ContivNodes: numNodes, ContivEnv: env}
 
 	if start {
 		output, err := vCmd.RunWithOutput("up")
@@ -110,7 +110,7 @@ func (v *Vagrant) setup(start bool, env string, nodes int) error {
 		}()
 	}
 
-	v.expectedNodes = nodes
+	v.expectedNodes = numNodes
 
 	output, err := vCmd.RunWithOutput("status")
 	if err != nil {
@@ -134,6 +134,12 @@ func (v *Vagrant) setup(start bool, env string, nodes int) error {
 	for _, nodeNameByte := range nodeNamesBytes {
 		nodeName := strings.Fields(string(nodeNameByte))[0]
 		nodeNames = append(nodeNames, nodeName)
+	}
+
+	if len(nodeNames) != numNodes {
+		err = fmt.Errorf("Number of running node(s) (%d) is not equal to number of expected node(s) (%d) in vagrant status output: \n%s\n",
+			len(nodeNames), numNodes, output)
+		return err
 	}
 
 	// some more work to figure the ssh port and private key details
