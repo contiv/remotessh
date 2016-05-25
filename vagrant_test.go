@@ -9,6 +9,8 @@ import (
 	. "testing"
 
 	. "gopkg.in/check.v1"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type vagrantTestSuite struct {
@@ -22,13 +24,31 @@ func TestVagrant(t *T) {
 		os.Exit(0)
 	}
 
+	log.SetLevel(log.DebugLevel)
+
 	TestingT(t)
 }
 
 func (v *vagrantTestSuite) SetUpSuite(c *C) {
 	vagrant := &Vagrant{}
-	vagrant.Setup(false, "", 3)
+	c.Assert(vagrant.Setup(false, []string{}, 3), IsNil)
 	v.vagrant = vagrant
+}
+
+func (v *vagrantTestSuite) TestRunEnv(c *C) {
+	vagrant := &Vagrant{}
+	c.Assert(vagrant.Setup(false, []string{"MYENV=foo"}, 3), IsNil)
+	outChan := make(chan string, 3)
+
+	c.Assert(vagrant.IterateNodes(func(node TestbedNode) error {
+		out, err := node.RunCommandWithOutput("echo $MYENV")
+		outChan <- out
+		return err
+	}), IsNil)
+
+	for x := 0; x < 3; x++ {
+		c.Assert(strings.TrimSpace(<-outChan), Equals, "foo")
+	}
 }
 
 func (v *vagrantTestSuite) TestSetupInvalidArgs(c *C) {
@@ -68,6 +88,7 @@ func (v *vagrantTestSuite) TestIterateNodes(c *C) {
 		mutex.Unlock()
 		return node.RunCommand("exit 0")
 	}), IsNil)
+
 	c.Assert(i, Equals, 3)
 
 	i = 0
