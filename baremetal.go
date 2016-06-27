@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package vagrantssh
+package remotessh
 
 import (
 	"fmt"
@@ -67,7 +67,7 @@ func (b *Baremetal) setup(hosts []HostInfo) error {
 // Setup initializes a baremetal testbed.
 func (b *Baremetal) Setup(args ...interface{}) error {
 	if _, ok := args[0].([]HostInfo); !ok {
-		return unexpectedSetupArgError("[]vagrantssh.HostInfo", args...)
+		return unexpectedSetupArgError("[]remotessh.HostInfo", args...)
 	}
 	return b.setup(args[0].([]HostInfo))
 }

@@ -1,5 +1,5 @@
 /*
-Package vagrantssh provides host connectivity in go for system/integration
+Package remotessh provides host connectivity in go for system/integration
 testing in a multi host environment. It supports two testbed environments viz.
 baremetal and vagrant
 
@@ -46,7 +46,7 @@ Sequentially:
 
 In Parallel:
 
-    err := tb.IterateNodes(func (node vagrantssh.TestbedNode) error {
+    err := tb.IterateNodes(func (node remotessh.TestbedNode) error {
       return node.RunCommand("docker ps -aq | xargs docker rm")
     })
 
@@ -68,7 +68,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package vagrantssh
+package remotessh
 
 import (
 	"fmt"

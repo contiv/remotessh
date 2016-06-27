@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package vagrantssh
+package remotessh
 
 import (
 	"fmt"
@@ -99,7 +99,7 @@ func newCmdStrWithSource(cmd string, env []string) string {
 	}
 
 	command := fmt.Sprintf("%s bash -lc '%s'", envstr, cmd)
-	log.Debugf("vagrantssh: Running: %q", command)
+	log.Debugf("remotessh: Running: %q", command)
 	return command
 }
 

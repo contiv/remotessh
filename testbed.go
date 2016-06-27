@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package vagrantssh
+package remotessh
 
 // Testbed is a collection of test nodes
 type Testbed interface {

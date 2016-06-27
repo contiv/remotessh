@@ -1,6 +1,6 @@
 // +build baremetal
 
-package vagrantssh
+package remotessh
 
 import (
 	"strings"
