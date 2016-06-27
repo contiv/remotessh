@@ -18,6 +18,36 @@ For example, this will select the "mynode" node and run "ls" on it.
     fmt.Println(out) // already a string
 ```
 
+Similarly for a Baremetal node:
+
+```go
+hosts := []HostInfo{
+		{
+			Name:        "self",
+			SSHAddr:     "127.0.0.1",
+			SSHPort:     "22",
+			User:        "vagrant",
+			PrivKeyFile: "/vagrant/testdata/insecure_private_key",
+		},
+		{
+			Name:        "self1",
+			SSHAddr:     "127.0.0.1",
+			SSHPort:     "22",
+			User:        "vagrant",
+			PrivKeyFile: "/vagrant/testdata/insecure_private_key",
+		},
+	}
+	bm := &Baremetal{}
+	c.Assert(bm.Setup(hosts), IsNil)
+    out, err := bm.GetNode("mynode").RunCommandWithOutput("ls")
+    if err != nil {
+      // exit status != 0
+      panic(err)
+    }
+
+    fmt.Println(out) // already a string
+```
+
 If you want to walk nodes, you have a few options:
 
 Sequentially:
