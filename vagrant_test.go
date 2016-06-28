@@ -1,6 +1,6 @@
 // +build vagrant
 
-package vagrantssh
+package remotessh
 
 import (
 	"os"
