@@ -97,6 +97,7 @@ func (v *Vagrant) setup(start bool, env []string, numNodes int) error {
 	v.nodes = map[string]TestbedNode{}
 
 	vCmd := &VagrantCommand{ContivNodes: numNodes}
+	vCmd.Env = append(vCmd.Env, env...)
 
 	if start {
 		output, err := vCmd.RunWithOutput("up")
