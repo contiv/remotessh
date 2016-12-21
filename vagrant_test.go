@@ -53,7 +53,7 @@ func (v *vagrantTestSuite) TestRunEnv(c *C) {
 
 func (v *vagrantTestSuite) TestSetupInvalidArgs(c *C) {
 	vagrant := &Vagrant{}
-	c.Assert(vagrant.Setup(1, "foo"), ErrorMatches, "Unexpected args to Setup.*Expected:.*Received:.*")
+	c.Assert(vagrant.Setup(1, "foo"), ErrorMatches, "unexpected args to Setup.*Expected:.*Received:.*")
 }
 
 func (v *vagrantTestSuite) TestRun(c *C) {

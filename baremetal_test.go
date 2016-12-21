@@ -45,7 +45,7 @@ func (b *baremetalTestSuite) SetUpSuite(c *C) {
 
 func (b *baremetalTestSuite) TestSetupInvalidArgs(c *C) {
 	bm := &Baremetal{}
-	c.Assert(bm.Setup(1, "foo"), ErrorMatches, "Unexpected args to Setup.*Expected:.*Received:.*")
+	c.Assert(bm.Setup(1, "foo"), ErrorMatches, "unexpected args to Setup.*Expected:.*Received:.*")
 }
 
 func (b *baremetalTestSuite) TestRun(c *C) {
