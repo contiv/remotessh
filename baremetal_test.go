@@ -7,7 +7,7 @@ import (
 	"sync"
 	. "testing"
 
-	. "gopkg.in/check.v1"
+	. "github.com/contiv/check"
 )
 
 type baremetalTestSuite struct {
