@@ -18,7 +18,7 @@ package remotessh
 import (
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func unexpectedSetupArgError(exptdTypes string, rcvdArgs ...interface{}) error {

@@ -8,9 +8,9 @@ import (
 	"sync"
 	. "testing"
 
-	. "gopkg.in/check.v1"
+	. "github.com/contiv/check"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type vagrantTestSuite struct {

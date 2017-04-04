@@ -1,22 +1,39 @@
 {
-	"ImportPath": "github.com/contiv/vagrant_ssh",
-	"GoVersion": "go1.5.1",
+	"ImportPath": "github.com/contiv/remotessh",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.6.4-12-g467d9d5",
-			"Rev": "467d9d55c2d2c17248441a8fc661561161f40d5e"
+			"ImportPath": "github.com/contiv/check",
+			"Rev": "9ae71e3cef5aeb7385a2cf1a10a84e5d4246b568"
+		},
+		{
+			"ImportPath": "github.com/sirupsen/logrus",
+			"Comment": "v0.11.2-6-g7f4b1ad",
+			"Rev": "7f4b1adc791766938c29457bed0703fb9134421a"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/curve25519",
+			"Rev": "459e26527287adbc2adcc5d0d49abff9a5f315a7"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ed25519",
+			"Rev": "459e26527287adbc2adcc5d0d49abff9a5f315a7"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"Rev": "459e26527287adbc2adcc5d0d49abff9a5f315a7"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/ssh",
-			"Rev": "83f1503f771a82af8a31f358eb825e9efb5dae6c"
+			"Rev": "459e26527287adbc2adcc5d0d49abff9a5f315a7"
 		},
 		{
-			"ImportPath": "gopkg.in/check.v1",
-			"Rev": "11d3bc7aa68e238947792f30573146a3231fc0f1"
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "7a6e5648d140666db5d920909e082ca00a87ba2c"
 		}
 	]
 }
