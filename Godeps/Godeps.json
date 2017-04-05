@@ -7,13 +7,13 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/contiv/check",
-			"Rev": "9ae71e3cef5aeb7385a2cf1a10a84e5d4246b568"
-		},
-		{
-			"ImportPath": "github.com/sirupsen/logrus",
+			"ImportPath": "github.com/Sirupsen/logrus",
 			"Comment": "v0.11.2-6-g7f4b1ad",
 			"Rev": "7f4b1adc791766938c29457bed0703fb9134421a"
+		},
+		{
+			"ImportPath": "github.com/contiv/check",
+			"Rev": "9ae71e3cef5aeb7385a2cf1a10a84e5d4246b568"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/curve25519",

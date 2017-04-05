@@ -10,7 +10,7 @@ import (
 
 	. "github.com/contiv/check"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 )
 
 type vagrantTestSuite struct {
